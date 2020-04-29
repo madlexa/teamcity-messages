@@ -33,8 +33,8 @@ project {
     vcsRoot(TeamCityPluginsByJetBrains_TeamCityPythonReporter)
 
     buildType(Test)
-    buildType(Python27windows)
-    buildType(Python36windows)
+    //buildType(Python27windows)
+    //buildType(Python36windows)
     buildType(Python37windows)
     buildType(Python38windows)
     buildType(Python27linux)
@@ -89,7 +89,7 @@ object PyPy2linux : BuildType({
     name = "pypy2_linux"
 
     params {
-        param("PYTHON_IMAGE", "coderunner/pypy2")
+        param("PYTHON_IMAGE", "pypy:2")
     }
 })
 
@@ -98,7 +98,7 @@ object PyPy3linux : BuildType({
     name = "pypy3_linux"
 
     params {
-        param("PYTHON_IMAGE", "coderunner/pypy3")
+        param("PYTHON_IMAGE", "pypy:3")
     }
 })
 
@@ -107,7 +107,7 @@ object Python27windows : BuildType({
     name = "python_27_windows"
 
     params {
-        param("PYTHON_VERSION", "2.7.16")
+        param("system.PYTHON_VERSION", "2.7.16")
     }
 })
 
@@ -116,16 +116,15 @@ object Python36windows : BuildType({
     name = "python_36_windows"
 
     params {
-        param("PYTHON_VERSION", "3.6.8")
+        param("system.PYTHON_VERSION", "3.6.8")
     }
 })
 
 object Python37windows : BuildType({
     templates(WindowsTeamcityMessages)
     name = "python_37_windows"
-
     params {
-        param("PYTHON_VERSION", "3.7.6")
+        param("system.PYTHON_VERSION", "3.7.7")
     }
 })
 
@@ -134,7 +133,7 @@ object Python38windows : BuildType({
     name = "python_38_windows"
 
     params {
-        param("PYTHON_VERSION", "3.8.1")
+        param("system.PYTHON_VERSION", "3.8.2")
     }
 })
 
@@ -160,10 +159,10 @@ object Test : BuildType({
         }
         snapshot(PyPy3linux) {
         }
-        snapshot(Python27windows) {
-        }
-        snapshot(Python36windows) {
-        }
+        //snapshot(Python27windows) {
+        //}
+        //snapshot(Python36windows) {
+        //}
         snapshot(Python37windows) {
         }
         snapshot(Python38windows) {
@@ -181,12 +180,14 @@ object LinuxTeamcityMessages : Template({
     steps {
         script {
             name = "Test"
+            id = "RUNNER_TEST"
             scriptContent = """
+                python -V
                 echo "Install"
                 pip install flake8 virtualenv pytest
+                echo "Running flake"
+                flake8 --ignore=E501,W504 --exclude=tests/guinea-pigs;
                 echo "Test"
-                python -V
-                echo "running flake"; flake8 --ignore=E501,W504 --exclude=tests/guinea-pigs;
                 python setup.py test
             """.trimIndent()
             dockerImage = "%PYTHON_IMAGE%"
@@ -207,17 +208,16 @@ object WindowsTeamcityMessages : Template({
             name = "Setup python"
             tasks = "buildBinaries"
             workingDir = "distributive"
-            gradleParams = "-Ppython_version=%PYTHON_VERSION%"
         }
         script {
             name = "Test"
             scriptContent = """
                 echo "Install"
-                %env.PYTHON_HOME%\python -m pip install --upgrade setuptools
+                %env.PYTHON_HOME%\python.exe -m pip install --upgrade setuptools
                 echo "Build"
-                %env.PYTHON_HOME%\python setup.py sdist
+                %env.PYTHON_HOME%\python.exe setup.py sdist
                 echo "Test"
-                %env.PYTHON_HOME%\python setup.py test
+                %env.PYTHON_HOME%\python.exe setup.py test
             """.trimIndent()
         }
     }
@@ -227,14 +227,11 @@ object WindowsTeamcityMessages : Template({
     }
 
     requirements {
-        equals("teamcity.agent.jvm.os.name", "Windows", "RQ_1")
+        contains("teamcity.agent.jvm.os.name", "Windows", "RQ_1")
     }
 })
 
 object TeamCityPluginsByJetBrains_TeamCityPythonReporter : GitVcsRoot({
     name = "github-teamcity-python-reporter"
     url = "https://github.com/madlexa/teamcity-messages.git"
-    authMethod = defaultPrivateKey {
-        userName = "git"
-    }
 })
