@@ -30,7 +30,7 @@ version = "2019.2"
 
 project {
 
-    vcsRoot(GitGithubComMadlexaTeamcityMessagesGit)
+    vcsRoot(TeamCityPluginsByJetBrains_TeamCityPythonReporter)
 
     buildType(Test)
     buildType(Python27windows)
@@ -175,7 +175,7 @@ object LinuxTeamcityMessages : Template({
     name = "linux-teamcity-messages"
 
     vcs {
-        root(GitHubTeamCityPythonReporter)
+        root(TeamCityPluginsByJetBrains_TeamCityPythonReporter)
     }
 
     steps {
@@ -199,7 +199,7 @@ object WindowsTeamcityMessages : Template({
     name = "windows-teamcity-messages"
 
     vcs {
-        root(GitHubTeamCityPythonReporter)
+        root(TeamCityPluginsByJetBrains_TeamCityPythonReporter)
     }
 
     steps {
@@ -231,9 +231,9 @@ object WindowsTeamcityMessages : Template({
     }
 })
 
-object GitHubTeamCityPythonReporter : GitVcsRoot({
-    name = "teamcity-python-reporter"
-    url = "git@github.com:madlexa/teamcity-messages.git"
+object TeamCityPluginsByJetBrains_TeamCityPythonReporter : GitVcsRoot({
+    name = "github-teamcity-python-reporter"
+    url = "https://github.com/madlexa/teamcity-messages.git"
     authMethod = defaultPrivateKey {
         userName = "git"
     }
