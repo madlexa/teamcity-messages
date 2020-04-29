@@ -18,3 +18,5 @@ dropin.cache
 _trial_temp*
 *.pyc
 __pycache__
+
+distributive/.gradle

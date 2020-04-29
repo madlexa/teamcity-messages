@@ -1,0 +1,33 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+plugins {
+  id "com.jetbrains.python.envs" version "0.0.30"
+}
+
+ext {
+  workingDirectory = new File(projectDir, "distributive")
+}
+
+envs {
+  project.buildDir = new File(projectDir, "build")
+  bootstrapDirectory = new File(project.buildDir, 'pythons')
+  envsDirectory = new File(project.buildDir, 'envs')
+
+  zipRepository = new URL("https://repo.labs.intellij.net/pycharm/python-archives-windows/")
+  shouldUseZipsFromRepository = true
+
+  python "python", project.ext["env.PYTHON_VERSION"], "64"
+  virtualenv "py", "python", ["cython"]
+}
+
+task buildBinaries(dependsOn: 'build_envs') {
+  exec {
+    workingDir workingDirectory
+
+    environment PYTHONPATH: workingDirectory,
+                MINICONDA32_ENVS: envs.envsDirectory,
+                MINICONDA64_ENVS: envs.envsDirectory
+
+    commandLine "${envs.envsDirectory}/py/Scripts/python.exe", "build_tools/build_binaries_windows.py"
+  }
+}
